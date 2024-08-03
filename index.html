@@ -3,7 +3,90 @@
   <head>
     <meta charset="utf-8">
     <title>Intro to AJAX Practice Tasks</title>
-    <script src="src/index.js" charset="utf-8"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        color: #333;
+        text-align: center;
+      }
+      #dog-image-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      #dog-image-container img {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+      }
+      #dog-image-container img:hover {
+        transform: scale(1.05);
+      }
+      #dog-breeds {
+        list-style: none;
+        padding: 0;
+      }
+      #dog-breeds li {
+        padding: 10px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+      }
+      #dog-breeds li:hover {
+        background-color: #f0f0f0;
+        color: #007bff;
+      }
+      #breed-dropdown {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        display: block;
+        margin: 0 auto;
+        width: 50%;
+      }
+      hr {
+        border: 0;
+        height: 1px;
+        background: #ddd;
+        margin: 20px 0;
+      }
+      label {
+        display: block;
+        text-align: center;
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+      #show-all-breeds {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      #show-all-breeds:hover {
+        background-color: #0056b3;
+      }
+    </style>
   </head>
   <body>
     <h1>Dog CEO</h1>
@@ -21,9 +104,70 @@
       <option value="d">d</option>
     </select>
 
-    <ul id="dog-breeds">
+    <button id="show-all-breeds">Show All Breeds</button>
 
+    <ul id="dog-breeds">
+      <!-- breeds here -->
     </ul>
 
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const imgUrl = "https://dog.ceo/api/breeds/image/random/4";
+        const breedUrl = "https://dog.ceo/api/breeds/list/all";
+        const dogImageContainer = document.getElementById('dog-image-container');
+        const dogBreedsList = document.getElementById('dog-breeds');
+        const breedDropdown = document.getElementById('breed-dropdown');
+        const showAllBreedsButton = document.getElementById('show-all-breeds');
+        let allBreeds = [];
+
+        // Fetch and display dog images
+        fetch(imgUrl)
+          .then(response => response.json())
+          .then(data => {
+            data.message.forEach(imageUrl => {
+              const img = document.createElement('img');
+              img.src = imageUrl;
+              dogImageContainer.appendChild(img);
+            });
+          });
+
+        // Fetch all breeds and store them
+        fetch(breedUrl)
+          .then(response => response.json())
+          .then(data => {
+            allBreeds = Object.keys(data.message);
+            renderBreeds(allBreeds);
+          });
+
+        // Render breeds to the list
+        function renderBreeds(breeds) {
+          dogBreedsList.innerHTML = '';
+          breeds.forEach(breed => {
+            const li = document.createElement('li');
+            li.textContent = breed;
+            dogBreedsList.appendChild(li);
+          });
+        }
+
+        // Change font color on click
+        dogBreedsList.addEventListener('click', (event) => {
+          if (event.target.tagName === 'LI') {
+            event.target.style.color = 'blue'; // Change to your desired color
+          }
+        });
+
+        // Filter breeds based on dropdown selection
+        breedDropdown.addEventListener('change', (event) => {
+          const selectedLetter = event.target.value;
+          const filteredBreeds = allBreeds.filter(breed => breed.startsWith(selectedLetter));
+          renderBreeds(filteredBreeds);
+        });
+
+        // Show all breeds when button is clicked
+        showAllBreedsButton.addEventListener('click', () => {
+          renderBreeds(allBreeds);
+        });
+      });
+    </script>
   </body>
 </html>
